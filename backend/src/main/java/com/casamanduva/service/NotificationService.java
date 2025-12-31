@@ -31,7 +31,7 @@ public class NotificationService {
         log.info("Sending new enquiry notification for: {}", enquiry.getEmail());
 
         if (!notificationEnabled) {
-            log.debug("Notifications are disabled, skipping email");
+            log.debug("Notifications disabled, skipping email");
             return;
         }
 
@@ -42,9 +42,9 @@ public class NotificationService {
             message.setText(buildEnquiryEmailBody(enquiry));
 
             mailSender.send(message);
-            log.info("Enquiry notification email sent successfully");
+            log.info("Enquiry notification email sent");
         } catch (Exception e) {
-            log.error("Failed to send enquiry notification email", e);
+            log.error("Failed to send enquiry notification", e);
         }
     }
 
@@ -53,7 +53,7 @@ public class NotificationService {
         log.info("Sending estimate enquiry notification for: {}", enquiry.getName());
 
         if (!notificationEnabled) {
-            log.debug("Notifications are disabled, skipping email");
+            log.debug("Notifications disabled, skipping email");
             return;
         }
 
@@ -64,9 +64,9 @@ public class NotificationService {
             message.setText(buildEstimateEmailBody(enquiry));
 
             mailSender.send(message);
-            log.info("Estimate enquiry notification email sent successfully");
+            log.info("Estimate enquiry notification email sent");
         } catch (Exception e) {
-            log.error("Failed to send estimate notification email", e);
+            log.error("Failed to send estimate notification", e);
         }
     }
 
@@ -74,26 +74,26 @@ public class NotificationService {
         return String.format("""
                 New Enquiry Received!
                 
-                ═══════════════════════════════════════
+                ================================
                 
                 Customer Details:
-                ─────────────────────────────────────
+                ────────────────────────────────
                 Name: %s
                 Email: %s
                 Phone: %s
                 
                 Project Details:
-                ─────────────────────────────────────
+                ────────────────────────────────
                 Property Type: %s
                 Budget: %s
                 Service: %s
                 Source: %s
                 
                 Message:
-                ─────────────────────────────────────
+                ────────────────────────────────
                 %s
                 
-                ═══════════════════════════════════════
+                ================================
                 
                 Quick Actions:
                 • Call: tel:%s
@@ -116,31 +116,27 @@ public class NotificationService {
     }
 
     private String buildEstimateEmailBody(EstimateEnquiry enquiry) {
-        // Safe null handling for bhkType and packageType
-        String bhkTypeDisplay = enquiry.getBhkType() != null ? enquiry.getBhkType().toUpperCase() : "Not specified";
-        String packageTypeDisplay = enquiry.getPackageType() != null ? enquiry.getPackageType() : "Not specified";
-
         return String.format("""
                 New Estimate Request!
                 
-                ═══════════════════════════════════════
+                ================================
                 
                 Customer Details:
-                ─────────────────────────────────────
+                ────────────────────────────────
                 Name: %s
                 Phone: %s
                 Email: %s
                 Location: %s
                 
                 Estimate Details:
-                ─────────────────────────────────────
+                ────────────────────────────────
                 BHK Type: %s
                 Package: %s
                 Area: %d sq.ft
                 Selected Rooms: %s
                 Estimated Budget: ₹%s
                 
-                ═══════════════════════════════════════
+                ================================
                 
                 Quick Actions:
                 • Call: tel:%s
@@ -152,8 +148,8 @@ public class NotificationService {
                 enquiry.getPhone(),
                 enquiry.getEmail() != null ? enquiry.getEmail() : "Not provided",
                 enquiry.getLocation() != null ? enquiry.getLocation() : "Not specified",
-                bhkTypeDisplay,
-                packageTypeDisplay,
+                enquiry.getBhkType() != null ? enquiry.getBhkType().toUpperCase() : "Not specified",
+                enquiry.getPackageType() != null ? enquiry.getPackageType() : "Not specified",
                 enquiry.getArea() != null ? enquiry.getArea() : 0,
                 enquiry.getSelectedRooms() != null ? enquiry.getSelectedRooms() : "Default",
                 enquiry.getEstimatedBudget() != null ? String.format("%,.0f", enquiry.getEstimatedBudget()) : "Not calculated",
@@ -168,6 +164,7 @@ public class NotificationService {
         if (!cleanPhone.startsWith("91")) {
             cleanPhone = "91" + cleanPhone;
         }
-        return String.format("https://wa.me/%s?text=%s", cleanPhone, java.net.URLEncoder.encode(message, java.nio.charset.StandardCharsets.UTF_8));
+        return String.format("https://wa.me/%s?text=%s", cleanPhone,
+                java.net.URLEncoder.encode(message, java.nio.charset.StandardCharsets.UTF_8));
     }
 }

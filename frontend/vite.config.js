@@ -4,30 +4,34 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 3000,
+    port: 5176,
+    strictPort: true,
+    host: '127.0.0.1',
     proxy: {
       '/api': {
-        // 🔥 FIX: force IPv4 (prevents ECONNREFUSED on Windows)
-        target: 'http://localhost:8081',
+        target: 'http://localhost:9090',
         changeOrigin: true,
-        secure: false
+        secure: false,
+        ws: true,
+        rewrite: (path) => path.replace(/^\/api/, '/api'),
+        onProxyReq: (proxyReq, req, res) => {
+          console.log(`[PROXY] ${req.method} ${req.url} -> ${proxyReq.path}`);
+        },
+        onError: (err, req, res) => {
+          console.error('Proxy error:', err);
+          res.writeHead(503, {
+            'Content-Type': 'application/json',
+          });
+          res.end(JSON.stringify({
+            success: false,
+            error: 'Backend API server is not available at http://localhost:9090'
+          }));
+        },
       }
     }
   },
   build: {
     outDir: 'dist',
     sourcemap: false,
-
-    // 🔥 FIX: use built-in minifier (no extra dependency needed)
-    minify: 'esbuild',
-
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          animations: ['framer-motion']
-        }
-      }
-    }
   }
 })

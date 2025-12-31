@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -16,16 +15,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class VisitorService {
-
     private final VisitorRepository visitorRepository;
-    private final NotificationService notificationService;
 
     @Transactional
     public Visitor trackVisitor(VisitorDTO visitorDTO, String ipAddress) {
-        log.debug("Tracking visitor from IP: {}", ipAddress);
-
+        log.debug("Tracking visitor from: {}", ipAddress);
         String sessionId = UUID.randomUUID().toString();
-
         Visitor visitor = Visitor.builder()
                 .ipAddress(ipAddress)
                 .userAgent(visitorDTO.getUserAgent())
@@ -36,13 +31,7 @@ public class VisitorService {
                 .page(visitorDTO.getPage())
                 .sessionId(sessionId)
                 .build();
-
-        Visitor savedVisitor = visitorRepository.save(visitor);
-
-        // Send welcome notification data back to frontend
-        log.debug("Visitor tracked with session: {}", sessionId);
-
-        return savedVisitor;
+        return visitorRepository.save(visitor);
     }
 
     public List<Visitor> getRecentVisitors() {

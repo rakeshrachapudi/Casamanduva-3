@@ -7,39 +7,36 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class EnquiryService {
-
     private final EnquiryRepository enquiryRepository;
     private final NotificationService notificationService;
 
     @Transactional
     public Enquiry createEnquiry(EnquiryDTO enquiryDTO) {
-        log.info("Creating new enquiry from: {}", enquiryDTO.getEmail());
-
+        log.info("Creating enquiry from: {}", enquiryDTO.getEmail());
         Enquiry enquiry = Enquiry.builder()
-                .name(enquiryDTO.getName())
-                .email(enquiryDTO.getEmail())
-                .phone(enquiryDTO.getPhone())
-                .propertyType(enquiryDTO.getPropertyType())
-                .budget(enquiryDTO.getBudget())
-                .service(enquiryDTO.getService())
-                .message(enquiryDTO.getMessage())
-                .source(enquiryDTO.getSource())
+                .name(enquiryDTO.getName().trim())
+                .email(enquiryDTO.getEmail().trim().toLowerCase())
+                .phone(enquiryDTO.getPhone().trim())
+                .propertyType(enquiryDTO.getPropertyType() != null ? enquiryDTO.getPropertyType().trim() : null)
+                .budget(enquiryDTO.getBudget() != null ? enquiryDTO.getBudget().trim() : null)
+                .service(enquiryDTO.getService() != null ? enquiryDTO.getService().trim() : null)
+                .message(enquiryDTO.getMessage() != null ? enquiryDTO.getMessage().trim() : null)
+                .source(enquiryDTO.getSource() != null ? enquiryDTO.getSource().trim() : "contact")
                 .status(Enquiry.EnquiryStatus.NEW)
                 .build();
-
         Enquiry savedEnquiry = enquiryRepository.save(enquiry);
-
-        // Send notification to admin
-        notificationService.sendNewEnquiryNotification(savedEnquiry);
-
-        log.info("Enquiry created with ID: {}", savedEnquiry.getId());
+        log.info("Enquiry created: {}", savedEnquiry.getId());
+        try {
+            notificationService.sendNewEnquiryNotification(savedEnquiry);
+        } catch (Exception e) {
+            log.error("Failed to send notification", e);
+        }
         return savedEnquiry;
     }
 
@@ -53,21 +50,28 @@ public class EnquiryService {
 
     public Enquiry getEnquiryById(Long id) {
         return enquiryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Enquiry not found with id: " + id));
+                .orElseThrow(() -> new RuntimeException("Enquiry not found: " + id));
     }
 
     @Transactional
     public Enquiry updateEnquiryStatus(Long id, Enquiry.EnquiryStatus status) {
         Enquiry enquiry = getEnquiryById(id);
         enquiry.setStatus(status);
+        if (status == Enquiry.EnquiryStatus.CONTACTED) {
+            enquiry.setContactedAt(java.time.LocalDateTime.now());
+        }
         return enquiryRepository.save(enquiry);
     }
 
     @Transactional
     public Enquiry addNote(Long id, String note) {
+        if (note == null || note.trim().isEmpty()) {
+            throw new IllegalArgumentException("Note cannot be empty");
+        }
         Enquiry enquiry = getEnquiryById(id);
+        String timestamp = java.time.LocalDateTime.now().toString();
         String existingNotes = enquiry.getNotes() != null ? enquiry.getNotes() + "\n" : "";
-        enquiry.setNotes(existingNotes + note);
+        enquiry.setNotes(existingNotes + "[" + timestamp + "] " + note.trim());
         return enquiryRepository.save(enquiry);
     }
 

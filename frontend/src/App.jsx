@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { useEffect } from 'react'
+import ErrorBoundary from './components/ErrorBoundary'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import WhatsAppButton from './components/WhatsAppButton'
@@ -17,7 +18,6 @@ import './App.css'
 
 function App() {
   useEffect(() => {
-    // Track visitor and trigger notification
     const initVisitorTracking = async () => {
       try {
         await trackVisitor()
@@ -29,41 +29,43 @@ function App() {
   }, [])
 
   return (
-    <Router>
-      <div className="app">
-        <Toaster 
-          position="top-right"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: '#2C2C2C',
-              color: '#fff',
-            },
-            success: {
-              iconTheme: {
-                primary: '#C9A96E',
-                secondary: '#fff',
+    <ErrorBoundary>
+      <Router>
+        <div className="app">
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: '#2C2C2C',
+                color: '#fff',
               },
-            },
-          }}
-        />
-        <NotificationBanner />
-        <Header />
-        <main className="main-content">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/services" element={<Services />} />
-            <Route path="/portfolio" element={<Portfolio />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/estimator" element={<Estimator />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </main>
-        <Footer />
-        <WhatsAppButton />
-      </div>
-    </Router>
+              success: {
+                iconTheme: {
+                  primary: '#C9A96E',
+                  secondary: '#fff',
+                },
+              },
+            }}
+          />
+          <NotificationBanner />
+          <Header />
+          <main className="main-content">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/services" element={<Services />} />
+              <Route path="/portfolio" element={<Portfolio />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/estimator" element={<Estimator />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </main>
+          <Footer />
+          <WhatsAppButton />
+        </div>
+      </Router>
+    </ErrorBoundary>
   )
 }
 

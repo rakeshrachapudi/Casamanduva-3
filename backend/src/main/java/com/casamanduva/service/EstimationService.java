@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -23,7 +22,6 @@ public class EstimationService {
     private final EstimateEnquiryRepository estimateEnquiryRepository;
     private final NotificationService notificationService;
 
-    // BHK Configuration
     private static final Map<String, BHKConfig> BHK_CONFIGS = Map.of(
             "1bhk", new BHKConfig("1 BHK", 550, 350000,
                     List.of("Living Room", "Bedroom", "Kitchen", "Bathroom")),
@@ -33,7 +31,6 @@ public class EstimationService {
                     List.of("Living Room", "Master Bedroom", "Bedroom 2", "Bedroom 3", "Kitchen", "Bathroom 1", "Bathroom 2", "Bathroom 3"))
     );
 
-    // Package Configuration
     private static final Map<String, PackageConfig> PACKAGE_CONFIGS = Map.of(
             "essential", new PackageConfig("Essential", 1800, 1.0,
                     List.of("Basic modular furniture", "Standard finishes", "Essential lighting", "1-year warranty")),
@@ -43,7 +40,6 @@ public class EstimationService {
                     List.of("Luxury custom furniture", "Imported finishes", "Smart lighting", "Full false ceiling", "Home automation ready", "3-year warranty"))
     );
 
-    // Room Base Prices
     private static final Map<String, Integer> ROOM_PRICES = Map.ofEntries(
             Map.entry("Living Room", 80000),
             Map.entry("Master Bedroom", 75000),
@@ -88,7 +84,6 @@ public class EstimationService {
             ));
         }
         result.put("packages", packageData);
-
         result.put("roomPrices", ROOM_PRICES);
         result.put("additionalRooms", List.of("Wardrobe", "Study Room", "Pooja Room", "Balcony"));
 
@@ -110,11 +105,14 @@ public class EstimationService {
                 ? request.getArea()
                 : bhkConfig.baseArea;
 
+        if (area < 300 || area > 5000) {
+            throw new IllegalArgumentException("Area must be between 300-5000 sq.ft");
+        }
+
         List<String> selectedRooms = request.getSelectedRooms() != null && !request.getSelectedRooms().isEmpty()
                 ? request.getSelectedRooms()
                 : bhkConfig.defaultRooms;
 
-        // Calculate room-wise cost
         List<Map<String, Object>> roomBreakdown = new ArrayList<>();
         int roomTotal = 0;
 
@@ -128,13 +126,8 @@ public class EstimationService {
             ));
         }
 
-        // Calculate area-based cost
         int areaCost = area * packageConfig.rate;
-
-        // Total estimate (higher of the two methods)
         int totalEstimate = Math.max(roomTotal, areaCost);
-
-        // Add 10% for miscellaneous
         int miscCost = (int) Math.round(totalEstimate * 0.1);
         int grandTotal = totalEstimate + miscCost;
         int perSqFt = grandTotal / area;
@@ -157,28 +150,45 @@ public class EstimationService {
     public EstimateEnquiry saveEstimateEnquiry(EstimateEnquiryDTO dto) {
         log.info("Saving estimate enquiry for: {}", dto.getName());
 
+        if (dto.getName() == null || dto.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Name is required");
+        }
+        if (dto.getPhone() == null || !dto.getPhone().matches("^[0-9+\\-()\\s]{10,}$")) {
+            throw new IllegalArgumentException("Valid phone number required");
+        }
+        if (dto.getArea() == null || dto.getArea() < 300 || dto.getArea() > 5000) {
+            throw new IllegalArgumentException("Area must be between 300-5000 sq.ft");
+        }
+
+        // Normalize bhkType and packageType to lowercase
+        String normalizedBhkType = dto.getBhkType() != null ? dto.getBhkType().toLowerCase() : "2bhk";
+        String normalizedPackageType = dto.getPackageType() != null ? dto.getPackageType().toLowerCase() : "premium";
+
         EstimateEnquiry enquiry = EstimateEnquiry.builder()
-                .name(dto.getName())
-                .phone(dto.getPhone())
-                .email(dto.getEmail())
-                .location(dto.getLocation())
-                .bhkType(dto.getBhkType())
-                .packageType(dto.getPackageType())
+                .name(dto.getName().trim())
+                .phone(dto.getPhone().trim())
+                .email(dto.getEmail() != null ? dto.getEmail().trim().toLowerCase() : null)
+                .location(dto.getLocation() != null ? dto.getLocation().trim() : null)
+                .bhkType(normalizedBhkType)  // Store as string
+                .packageType(normalizedPackageType)  // Store as string
                 .selectedRooms(dto.getSelectedRooms())
                 .area(dto.getArea())
                 .estimatedBudget(dto.getEstimatedBudget() != null
                         ? new BigDecimal(dto.getEstimatedBudget())
                         : null)
-                .source(dto.getSource())
+                .source(dto.getSource() != null ? dto.getSource() : "website")
                 .status(Enquiry.EnquiryStatus.NEW)
                 .build();
 
         EstimateEnquiry savedEnquiry = estimateEnquiryRepository.save(enquiry);
+        log.info("Estimate enquiry saved: {}", savedEnquiry.getId());
 
-        // Send notification
-        notificationService.sendEstimateEnquiryNotification(savedEnquiry);
+        try {
+            notificationService.sendEstimateEnquiryNotification(savedEnquiry);
+        } catch (Exception e) {
+            log.error("Failed to send notification", e);
+        }
 
-        log.info("Estimate enquiry saved with ID: {}", savedEnquiry.getId());
         return savedEnquiry;
     }
 
@@ -186,7 +196,6 @@ public class EstimationService {
         return estimateEnquiryRepository.findAllByOrderByCreatedAtDesc();
     }
 
-    // Inner classes for configuration
     private record BHKConfig(String name, int baseArea, int basePrice, List<String> defaultRooms) {}
     private record PackageConfig(String name, int rate, double multiplier, List<String> features) {}
 }
