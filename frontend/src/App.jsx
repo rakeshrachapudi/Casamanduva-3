@@ -14,7 +14,6 @@ import Contact from "./pages/Contact";
 import Estimator from "./pages/Estimator";
 import NotFound from "./pages/NotFound";
 import { trackVisitor } from "./services/api";
-import InteriorSolutionsSection from "./components/InteriorSolutionsSection";
 
 import "./App.css";
 
@@ -63,7 +62,6 @@ function App() {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
-          <InteriorSolutionsSection />
           <Footer />
           <WhatsAppButton />
         </div>

@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import SEO from "../components/SEO";
 import AnimatedSection from "../components/AnimatedSection";
 import EnquiryForm from "../components/EnquiryForm";
+import InteriorSolutionsSection from "../components/InteriorSolutionsSection";
 
 const themes = [
   {
@@ -137,7 +138,6 @@ const Home = () => {
         url="/"
         schema={homeSchema}
       />
-
       {/* Hero Section */}
       <section className="hero">
         <div className="hero-bg">
@@ -206,7 +206,6 @@ const Home = () => {
           <div className="scroll-line"></div>
         </div>
       </section>
-
       {/* Philosophy Section */}
       <section className="section" style={{ background: "var(--color-ivory)" }}>
         <div className="container">
@@ -257,7 +256,6 @@ const Home = () => {
           </div>
         </div>
       </section>
-
       {/* Themes Section */}
       <section
         className="section"
@@ -308,7 +306,6 @@ const Home = () => {
           </AnimatedSection>
         </div>
       </section>
-
       {/* Process Section */}
       <section className="section" style={{ background: "var(--color-ivory)" }}>
         <div className="container">
@@ -335,7 +332,6 @@ const Home = () => {
           </div>
         </div>
       </section>
-
       {/* Testimonials Section */}
       <section className="testimonials-section">
         <div className="container">
@@ -370,7 +366,7 @@ const Home = () => {
           </div>
         </div>
       </section>
-
+      <InteriorSolutionsSection />;{/* Contact Section */}
       {/* CTA Section */}
       <section className="cta-section">
         <div className="container">
@@ -386,8 +382,6 @@ const Home = () => {
           </AnimatedSection>
         </div>
       </section>
-
-      {/* Contact Section */}
       <section
         className="section"
         id="contact-section"
