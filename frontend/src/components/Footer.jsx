@@ -56,7 +56,7 @@ const Footer = () => {
           <div className="footer-column">
             <h4>Contact</h4>
             <ul>
-              <li><a href="tel:+917730051329">+91 91218 85090</a></li>
+              <li><a href="tel:+919121885090">+91 91218 85090</a></li>
               <li><a href="mailto:info@casamanduva.com">info@casamanduva.com</a></li>
               <li><Link to="/contact">Hyderabad, India</Link></li>
             </ul>

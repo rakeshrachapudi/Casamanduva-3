@@ -118,7 +118,7 @@ const EnquiryForm = ({ source = 'contact' }) => {
     const message = encodeURIComponent(
       `Hi CASAMANDUVA! I'm ${formData.name.trim()}. Looking for ${formData.service || 'interior design'}. ${formData.message?.trim() || ''}`
     );
-    window.open(`https://wa.me/917730051329?text=${message}`, '_blank');
+    window.open(`https://wa.me/919121885090?text=${message}`, '_blank');
   };
 
   return (

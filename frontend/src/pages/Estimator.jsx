@@ -240,7 +240,7 @@ const Estimator = () => {
         BHK_DATA[selectedBHK].name
       } (${selectedPackage} package). I'd like to discuss this further.`
     );
-    window.open(`https://wa.me/917730051329?text=${message}`, "_blank");
+    window.open(`https://wa.me/919121885090?text=${message}`, "_blank");
   };
 
   const estimatorSchema = {

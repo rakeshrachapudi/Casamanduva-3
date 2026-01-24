@@ -9,7 +9,7 @@ const Contact = () => {
     mainEntity: {
       "@type": "LocalBusiness",
       name: "CASAMANDUVA",
-      telephone: "+91-7730051329",
+      telephone: "+91-9121885090",
       email: "info@casamanduva.com",
       address: {
         "@type": "PostalAddress",
@@ -90,7 +90,7 @@ const Contact = () => {
                   <div className="info-content">
                     <h4>Call Us</h4>
                     <p>
-                      <a href="tel:+917730051329">+91 91218 85090</a>
+                      <a href="tel:+919121885090">+91 91218 85090</a>
                     </p>
                     <p style={{ fontSize: "0.85rem", opacity: 0.7 }}>
                       Mon - Sat: 10:00 AM - 7:00 PM
@@ -119,7 +119,7 @@ const Contact = () => {
                     <h4>WhatsApp</h4>
                     <p>
                       <a
-                        href="https://wa.me/917730051329"
+                        href="https://wa.me/9199121885090"
                         target="_blank"
                         rel="noopener noreferrer"
                       >

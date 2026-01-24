@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const WHATSAPP_PHONE = '917730051329';
+const WHATSAPP_PHONE = '919121885090';
 
 const WhatsAppButton = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

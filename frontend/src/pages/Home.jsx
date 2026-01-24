@@ -413,7 +413,7 @@ const Home = () => {
                   <div className="info-content">
                     <h4>Call Us</h4>
                     <p>
-                      <a href="tel:+917730051329">+91 91218 85090</a>
+                      <a href="tel:+919121885090">+91 91218 85090</a>
                     </p>
                   </div>
                 </div>
