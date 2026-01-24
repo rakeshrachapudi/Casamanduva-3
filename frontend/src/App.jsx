@@ -6,6 +6,10 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import WhatsAppButton from "./components/WhatsAppButton";
 import NotificationBanner from "./components/NotificationBanner";
+import ExitIntentPopup from "./components/ExitIntentPopup";
+import StickyActionBar from "./components/StickyActionBar";
+import LiveActivityFeed from "./components/LiveActivityFeed";
+import OfferBanner from "./components/OfferBanner";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Services from "./pages/Services";
@@ -49,8 +53,15 @@ function App() {
               },
             }}
           />
+
+          {/* NEW: Offer Banner */}
+          <OfferBanner />
+
+          {/* Existing Notification Banner */}
           <NotificationBanner />
+
           <Header />
+
           <main className="main-content">
             <Routes>
               <Route path="/" element={<Home />} />
@@ -62,8 +73,20 @@ function App() {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
+
           <Footer />
+
+          {/* Enhanced WhatsApp Button */}
           <WhatsAppButton />
+
+          {/* NEW: Exit Intent Popup */}
+          <ExitIntentPopup />
+
+          {/* NEW: Sticky Action Bar */}
+          <StickyActionBar />
+
+          {/* NEW: Live Activity Feed */}
+          <LiveActivityFeed />
         </div>
       </Router>
     </ErrorBoundary>

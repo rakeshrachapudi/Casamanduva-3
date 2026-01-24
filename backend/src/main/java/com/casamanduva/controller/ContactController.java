@@ -6,6 +6,7 @@ import com.casamanduva.model.Enquiry;
 import com.casamanduva.model.NewsletterSubscriber;
 import com.casamanduva.repository.NewsletterRepository;
 import com.casamanduva.service.EnquiryService;
+import com.casamanduva.service.NotificationService;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Bucket4j;
@@ -28,6 +29,7 @@ public class ContactController {
 
     private final EnquiryService enquiryService;
     private final NewsletterRepository newsletterRepository;
+    private final NotificationService notificationService; // 🔥 ADDED THIS
 
     // Create buckets with final modifier
     private final Bucket contactFormBucket = Bucket4j.builder()
@@ -110,6 +112,13 @@ public class ContactController {
             NewsletterSubscriber saved = newsletterRepository.save(subscriber);
             log.info("New newsletter subscriber: {}", email);
 
+            // 🔥 SEND WELCOME EMAIL TO USER
+            try {
+                notificationService.sendNewsletterWelcome(email);
+            } catch (Exception e) {
+                log.error("Failed to send newsletter welcome email", e);
+            }
+
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ApiResponse.success(saved, "Successfully subscribed to our newsletter!"));
         } catch (Exception e) {
@@ -137,7 +146,6 @@ public class ContactController {
                     subscriber.setActive(false);
                     subscriber.setUnsubscribedAt(java.time.LocalDateTime.now());
                     newsletterRepository.save(subscriber);
-                    //log.info("Unsubscribed email: {}", email);
                     return ResponseEntity.ok(ApiResponse.success(null, "Successfully unsubscribed"));
                 })
                 .orElse(ResponseEntity.ok(ApiResponse.success(null, "Email not found in our list")));

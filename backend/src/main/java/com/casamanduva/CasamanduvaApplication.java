@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication
-@EnableAsync
+@EnableAsync  // 🔥 ADDED THIS TO ENABLE ASYNC EMAIL SENDING
 public class CasamanduvaApplication {
 
     public static void main(String[] args) {
